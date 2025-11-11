@@ -1,0 +1,3 @@
+package com.example.apppoketeam.data.local
+import androidx.room.*; import kotlinx.coroutines.flow.Flow
+@Dao interface FunFactDAO{@Insert suspend fun inserir(fact: FunFact);@Update suspend fun atualizar(fact: FunFact);@Delete suspend fun deletar(fact: FunFact);@Query("SELECT * FROM fatos_curiosos WHERE pokemonName = :pokemonName ORDER BY id DESC") fun buscarFatos(pokemonName: String): Flow<List<FunFact>>;@Query("SELECT * FROM fatos_curiosos") fun buscarTodos(): Flow<List<FunFact>>}

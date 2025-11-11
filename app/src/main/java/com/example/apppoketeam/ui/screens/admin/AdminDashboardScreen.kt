@@ -1,17 +1,13 @@
 package com.example.apppoketeam.ui.screens.admin
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,37 +16,19 @@ import com.example.apppoketeam.ui.components.AdminBottomNav
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdminDashboard() {
+fun AdminDashboard(rootNavController: NavHostController) {
     val navController = rememberNavController()
-    Scaffold(bottomBar = { AdminBottomNav(navController = navController) }) { padding ->
-        NavHost(navController = navController, startDestination = "admin_ranking", Modifier.padding(padding)) {
-            composable("admin_ranking") { AdminRankingScreen(factory = ViewModelFactory(LocalContext.current)) }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AdminRankingScreen(factory: ViewModelFactory) {
-    val viewModel: AdminRankingViewModel = viewModel(factory = factory)
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Column(Modifier.padding(16.dp)) {
-        Text("Gerenciar Ranking", style = MaterialTheme.typography.headlineSmall)
-        TextField(value = uiState.nome, onValueChange = viewModel::onNomeChange, label = { Text("Nome do Jogador") }, modifier = Modifier.fillMaxWidth())
-        TextField(value = uiState.pontuacao, onValueChange = viewModel::onPontuacaoChange, label = { Text("Pontuação") }, modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(8.dp))
-        Button(onClick = viewModel::onSave) { Text(uiState.textoBotao) }
-        Spacer(Modifier.height(16.dp))
-        Text("Ranking Atual", style = MaterialTheme.typography.headlineSmall)
-        LazyColumn {
-            items(uiState.ranking) { ranking ->
-                Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("${ranking.nomeJogador} - ${ranking.pontuacao} Pts", modifier = Modifier.weight(1f))
-                    Button(onClick = { viewModel.onEdit(ranking) }) { Text("Editar") }
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = { viewModel.onDelete(ranking) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("X") }
-                }
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Área do Admin") }, actions = {
+            IconButton(onClick = { rootNavController.navigate("login") { popUpTo(0) } }) {
+                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sair")
             }
+        })},
+        bottomBar = { AdminBottomNav(navController = navController) }
+    ) { padding ->
+        NavHost(navController = navController, startDestination = "admin_users", Modifier.padding(padding)) {
+            composable("admin_users") { AdminUserScreen(factory = ViewModelFactory(LocalContext.current)) }
+            composable("admin_facts") { AdminFactScreen(factory = ViewModelFactory(LocalContext.current)) }
         }
     }
 }
